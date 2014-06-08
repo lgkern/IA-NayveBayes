@@ -16,6 +16,8 @@ namespace IA_Nayve_Bayes
     }
     class NayveBayes
     {
+        Dictionary PositiveDic;
+        Dictionary NegativeDic;
         public NayveBayes()
         {
             //Tokenization
@@ -31,7 +33,7 @@ namespace IA_Nayve_Bayes
             //10-fold cross validation *10
             for (int i = 0; i < 10; i++)
             {
-                FoldCrossValidation(i*20 + 27);
+                FoldCrossValidation(i*20);
             }
 
 
@@ -41,11 +43,13 @@ namespace IA_Nayve_Bayes
 
         private void FoldCrossValidation(int startIndex)
         {
+            PositiveDic = new Dictionary();
+            NegativeDic = new Dictionary();
             //Cria conjuntos de treinamento e de teste para essa iteração
             List<int> testingSet = new List<int>();
             List<int> trainingSet = new List<int>();
             int distance = 0;
-            for (int i = 27; i < 227; i++)
+            for (int i = 0; i < 200; i++)
             {
                 distance =  i - startIndex;
                 if(distance < 0 || distance > 20)
@@ -56,9 +60,32 @@ namespace IA_Nayve_Bayes
                 testingSet.Add(i);            
             }
 
+            foreach (int index in trainingSet)
+            {
+                Console.WriteLine("Creating Dictionary from file " + (index+27));
+                positiveTraining(index);
+                negativeTraining(index);
+            }
+
 
 
         }       
+
+        private void positiveTraining(int index)
+        {
+            foreach (String word in positive[index].purifiedList)
+            {
+                PositiveDic.addWord(word);
+            }
+        }
+
+        private void negativeTraining(int index)
+        {
+            foreach (String word in negative[index].purifiedList)
+            {
+                PositiveDic.addWord(word);
+            }
+        }
 
         FileHandler[] positive;
         FileHandler[] negative;
@@ -69,7 +96,8 @@ namespace IA_Nayve_Bayes
     {
         public Dictionary()
         {
-
+            words = new List<Word>();
+            _wordCount = 0;
         }
 
         private int _wordCount = 0;
@@ -85,10 +113,11 @@ namespace IA_Nayve_Bayes
             if (!words.Contains(new Word(word)))
             {         
                 words.Add(new Word(word));
+                _wordCount++;
             }
             int foundIndex = words.FindIndex(x => x.Text() == word);
 
-            return words[foundIndex].AddReference(); ;
+            return words[foundIndex].AddReference();
         }
 
 
@@ -144,7 +173,7 @@ namespace IA_Nayve_Bayes
         }
         StreamReader text;
         String[] purifiedText;
-        List<String> purifiedList;
+        public List<String> purifiedList;
         
         void removeImpurities()
         {   
