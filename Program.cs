@@ -16,8 +16,7 @@ namespace IA_Nayve_Bayes
     }
     class NayveBayes
     {
-        Dictionary PositiveDic;
-        Dictionary NegativeDic;
+        Dictionary dictionary;        
         public NayveBayes()
         {
             //Tokenization
@@ -43,8 +42,8 @@ namespace IA_Nayve_Bayes
 
         private void FoldCrossValidation(int startIndex)
         {
-            PositiveDic = new Dictionary();
-            NegativeDic = new Dictionary();
+            dictionary = new Dictionary();
+            
             //Cria conjuntos de treinamento e de teste para essa iteração
             List<int> testingSet = new List<int>();
             List<int> trainingSet = new List<int>();
@@ -75,7 +74,7 @@ namespace IA_Nayve_Bayes
         {
             foreach (String word in positive[index].purifiedList)
             {
-                PositiveDic.addWord(word);
+                dictionary.addPositiveWord(word);
             }
         }
 
@@ -83,7 +82,7 @@ namespace IA_Nayve_Bayes
         {
             foreach (String word in negative[index].purifiedList)
             {
-                PositiveDic.addWord(word);
+                dictionary.addNegativeWord(word);
             }
         }
 
@@ -96,28 +95,44 @@ namespace IA_Nayve_Bayes
     {
         public Dictionary()
         {
-            words = new List<Word>();
+            positiveWords = new List<Word>();
+            negativeWords = new List<Word>();
             _wordCount = 0;
         }
 
         private int _wordCount = 0;
-        private List<Word> words;
+        private List<Word> positiveWords;
+        private List<Word> negativeWords;
 
         public void setWordCount(int wordCount)
         {
             _wordCount = wordCount;
         }
 
-        public int addWord(String word)
-        {            
-            if (!words.Contains(new Word(word)))
-            {         
-                words.Add(new Word(word));
-                _wordCount++;
+        public int addPositiveWord(String word)
+        {
+            if (!positiveWords.Contains(new Word(word)))
+            {
+                positiveWords.Add(new Word(word));
+                if (!negativeWords.Contains(new Word(word)))
+                    _wordCount++;
             }
-            int foundIndex = words.FindIndex(x => x.Text() == word);
+            int foundIndex = positiveWords.FindIndex(x => x.Text() == word);
 
-            return words[foundIndex].AddReference();
+            return positiveWords[foundIndex].AddReference();
+        }
+
+        public int addNegativeWord(String word)
+        {
+            if (!negativeWords.Contains(new Word(word)))
+            {
+                negativeWords.Add(new Word(word));
+                if (!positiveWords.Contains(new Word(word)))
+                    _wordCount++;
+            }
+            int foundIndex = negativeWords.FindIndex(x => x.Text() == word);
+
+            return negativeWords[foundIndex].AddReference();
         }
 
 
