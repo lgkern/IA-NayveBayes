@@ -81,17 +81,14 @@ namespace IA_Nayve_Bayes
         }
 
         public int addWord(String word)
-        {
-            if (words.Contains(new Word(word)))
-            {
-                int foundIndex = words.FindIndex(x => x.Text() == word);
+        {            
+            if (!words.Contains(new Word(word)))
+            {         
+                words.Add(new Word(word));
             }
-            else
-            {
+            int foundIndex = words.FindIndex(x => x.Text() == word);
 
-            }
-
-            return 0;
+            return words[foundIndex].AddReference(); ;
         }
 
 
@@ -105,11 +102,17 @@ namespace IA_Nayve_Bayes
         }
 
         public String _word;
-        private int references;
+        private int references = 0;
 
         public String Text()
         {
             return _word;
+        }
+
+        public int AddReference()
+        {
+            references++;
+            return references;
         }
 
         public int ReferenceCount()
