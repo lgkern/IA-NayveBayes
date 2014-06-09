@@ -16,7 +16,8 @@ namespace IA_Nayve_Bayes
     }
     class NayveBayes
     {
-        Dictionary dictionary;        
+        Dictionary dictionary;
+        String resultPath = @"G:\UFRGS\IA\results\";
         public NayveBayes()
         {
             //Tokenization
@@ -51,7 +52,7 @@ namespace IA_Nayve_Bayes
             for (int i = 0; i < 200; i++)
             {
                 distance =  i - startIndex;
-                if(distance < 0 || distance > 20)
+                if(distance < 0 || distance >= 20)
                 {
                     trainingSet.Add(i);                    
                     continue;
@@ -76,28 +77,52 @@ namespace IA_Nayve_Bayes
                 negativeResults[test] = negativeClassifier(index);
                 test++;
             }
+            int tp = 0;
+            int fp = 0;
+            int tn = 0;
+            int fn = 0;
+
+            foreach (bool result in positiveResults)
+            {
+                if (result) tp++; else fn++;
+            }
+
+            foreach (bool result in negativeResults)
+            {
+                if (result) fp++; else tn++;
+            }
+
+            using (FileStream fs = new FileStream(resultPath+"results"+startIndex/20+".txt", FileMode.Append, FileAccess.Write))
+            using (StreamWriter sw = new StreamWriter(fs))
+            {
+                sw.WriteLine("True Positives = "+tp);
+                sw.WriteLine("False Negatives = " + fn);                
+                sw.WriteLine("True Negatives = "+tn);
+                sw.WriteLine("False Positives = " + fp);
+            }
+
         }       
 
         private bool positiveClassifier(int index)
         {
-            double positiveAc = 1.0;
-            double negativeAc = 1.0;
+            double positiveAc = 0.0;
+            double negativeAc = 0.0;
             foreach (String word in positive[index].purifiedList)
             {
-                positiveAc *= dictionary.PositiveProbability(word);
-                negativeAc *= dictionary.NegativeProbability(word);
+                positiveAc +=  Math.Log(dictionary.PositiveProbability(word),2);
+                negativeAc +=  Math.Log(dictionary.NegativeProbability(word),2);
             }
             return positiveAc>negativeAc?true:false;
         }
 
         private bool negativeClassifier(int index)
         {
-            double positiveAc = 1.0;
-            double negativeAc = 1.0;
+            double positiveAc = 0.0;
+            double negativeAc = 0.0;
             foreach (String word in negative[index].purifiedList)
             {
-                positiveAc *= dictionary.PositiveProbability(word);
-                negativeAc *= dictionary.NegativeProbability(word);
+                positiveAc += Math.Log(dictionary.PositiveProbability(word),2);
+                negativeAc += Math.Log(dictionary.NegativeProbability(word),2);
             }
             return positiveAc > negativeAc ? true : false;
         }
