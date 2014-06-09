@@ -64,10 +64,7 @@ namespace IA_Nayve_Bayes
                 Console.WriteLine("Creating Dictionary from file " + (index+27));
                 positiveTraining(index);
                 negativeTraining(index);
-            }
-
-
-
+            }            
         }       
 
         private void positiveTraining(int index)
@@ -98,9 +95,11 @@ namespace IA_Nayve_Bayes
             positiveWords = new List<Word>();
             negativeWords = new List<Word>();
             _wordCount = 0;
+            _totalWords = 0;
         }
 
         private int _wordCount = 0;
+        private int _totalWords = 0;
         private List<Word> positiveWords;
         private List<Word> negativeWords;
 
@@ -109,8 +108,35 @@ namespace IA_Nayve_Bayes
             _wordCount = wordCount;
         }
 
+        //Probabilidade da palavra ser dessa classe é (Count+1)/(Vocabulário+Wordcount)
+
+        public double PositiveProbability(String word)
+        {
+            int bullshit = _wordCount + _totalWords;
+
+            if (!positiveWords.Contains(new Word(word)))
+            {
+                return (double)1 / bullshit;
+            }
+            int foundIndex = positiveWords.FindIndex(x => x.Text() == word);
+            return (double)(1 + positiveWords[foundIndex].ReferenceCount()) / bullshit;
+        }
+
+        public double NegativeProbability(String word)
+        {
+            int bullshit = _wordCount + _totalWords;
+
+            if (!negativeWords.Contains(new Word(word)))
+            {
+                return (double)1 / bullshit;
+            }
+            int foundIndex = negativeWords.FindIndex(x => x.Text() == word);
+            return (double)(1 + negativeWords[foundIndex].ReferenceCount()) / bullshit;
+        }
+
         public int addPositiveWord(String word)
         {
+            _totalWords++;
             if (!positiveWords.Contains(new Word(word)))
             {
                 positiveWords.Add(new Word(word));
@@ -124,6 +150,7 @@ namespace IA_Nayve_Bayes
 
         public int addNegativeWord(String word)
         {
+            _totalWords++;
             if (!negativeWords.Contains(new Word(word)))
             {
                 negativeWords.Add(new Word(word));
@@ -134,8 +161,6 @@ namespace IA_Nayve_Bayes
 
             return negativeWords[foundIndex].AddReference();
         }
-
-
     }
 
     class Word
