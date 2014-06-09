@@ -64,8 +64,43 @@ namespace IA_Nayve_Bayes
                 Console.WriteLine("Creating Dictionary from file " + (index+27));
                 positiveTraining(index);
                 negativeTraining(index);
-            }            
+            }
+            //Done with the gym, now to some productory action!
+            int test = 0;
+            positiveResults = new bool[20];
+            negativeResults = new bool[20];
+            foreach (int index in testingSet)
+            {
+                Console.WriteLine("Testing files " + (index + 27) + ".txt");
+                positiveResults[test] = positiveClassifier(index);
+                negativeResults[test] = negativeClassifier(index);
+                test++;
+            }
         }       
+
+        private bool positiveClassifier(int index)
+        {
+            double positiveAc = 1.0;
+            double negativeAc = 1.0;
+            foreach (String word in positive[index].purifiedList)
+            {
+                positiveAc *= dictionary.PositiveProbability(word);
+                negativeAc *= dictionary.NegativeProbability(word);
+            }
+            return positiveAc>negativeAc?true:false;
+        }
+
+        private bool negativeClassifier(int index)
+        {
+            double positiveAc = 1.0;
+            double negativeAc = 1.0;
+            foreach (String word in negative[index].purifiedList)
+            {
+                positiveAc *= dictionary.PositiveProbability(word);
+                negativeAc *= dictionary.NegativeProbability(word);
+            }
+            return positiveAc > negativeAc ? true : false;
+        }
 
         private void positiveTraining(int index)
         {
@@ -85,6 +120,9 @@ namespace IA_Nayve_Bayes
 
         FileHandler[] positive;
         FileHandler[] negative;
+
+        bool[]  positiveResults;
+        bool[]  negativeResults;
 
     }
 
